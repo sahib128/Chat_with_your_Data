@@ -1,0 +1,50 @@
+import subprocess
+import time
+import os
+import signal
+import requests
+
+# Function to start the Ollama server
+def start_ollama_server():
+    # Start the server using subprocess
+    process = subprocess.Popen(['ollama', 'serve'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    
+    # Wait for the server to start
+    time.sleep(5)  # Adjust this delay based on how long the server takes to start
+    
+    # Check if the server started successfully
+    # You might need to adjust the URL and port based on your server configuration
+    try:
+        response = requests.get('http://127.0.0.1:11434/health')  # Adjust endpoint if needed
+        if response.status_code == 200:
+            print("Ollama server is running.")
+            return process
+        else:
+            print("Failed to start Ollama server.")
+            process.terminate()
+            return None
+    except requests.ConnectionError:
+        print("Failed to connect to Ollama server.")
+        process.terminate()
+        return None
+
+# Function to stop the Ollama server
+def stop_ollama_server(process):
+    process.terminate()  # Gracefully terminate the server process
+    process.wait()  # Wait for the process to end
+
+# Main function
+def main():
+    server_process = start_ollama_server()
+    if server_process is None:
+        return  # Exit if the server failed to start
+    
+    try:
+        # Your code to interact with the server goes here
+        # For example, making queries to the server, etc.
+        pass
+    finally:
+        stop_ollama_server(server_process)
+
+if __name__ == '__main__':
+    main()
